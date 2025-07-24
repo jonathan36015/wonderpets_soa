@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WonderPets SOA Receipt Generator</title>
+<!-- Google Fonts for a modern look -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+  }
+
+  header {
+    background-color: #4CAF50;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    color: #fff;
+  }
+  .logo {
+    font-size: 2em;
+    font-weight: bold;
+    margin-right: 15px;
+    letter-spacing: 2px;
+  }
+  .title {
+    font-size: 1.5em;
+    font-weight: 600;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+  }
+
+  .card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2E7D32;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-top: 15px;
+    font-weight: 600;
+  }
+
+  input {
+    margin-top: 8px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+  }
+
+  input:focus {
+    border-color: #FFC107;
+    outline: none;
+  }
+
+  button {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #FFEB3B;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #FFC107;
+  }
+
+  /* Receipt styling with modern design */
+  #receipt {
+    display: none;
+    margin-top: 30px;
+  }
+
+  .receipt-card {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  #receipt h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: #2E7D32;
+  }
+
+  .receipt-details {
+    font-size: 1.2em;
+    line-height: 1.6;
+  }
+
+  .receipt-details p {
+    margin: 12px 0;
+  }
+
+  /* Buttons inside receipt */
+  #printBtn, #historyBtn, #registerBtn, #anotherBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  #printBtn {
+    background-color: #4CAF50;
+    color: #fff;
+  }
+
+  #printBtn:hover {
+    background-color: #388E3C;
+  }
+
+  #historyBtn {
+    background-color: #FFC107;
+  }
+
+  #historyBtn:hover {
+    background-color: #FFA000;
+  }
+
+  #registerBtn {
+    background-color: #2196F3; /* Blue for register */
+  }
+
+  #registerBtn:hover {
+    background-color: #1976D2;
+  }
+
+  #anotherBtn {
+    background-color: #9E9E9E; /* Gray for generate another */
+  }
+
+  #anotherBtn:hover {
+    background-color: #757575;
+  }
+
+  /* Client history styling */
+  #clientHistory {
+    display: none;
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  #clientHistory h3 {
+    margin-top: 0;
+    color: #2E7D32;
+  }
+  #clientList {
+    list-style: none;
+    padding: 0;
+  }
+  #clientList li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  /* Style for client name and info button */
+  .client-entry {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+  /* Style for info button */
+  .infoBtn {
+    background-color: #2196F3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  .infoBtn:hover {
+    background-color: #1976D2;
+  }
+
+  /* Responsive */
+  @media(max-width: 600px) {
+    .container {
+      padding: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">WonderPets</div>
+  <div class="title">SOA & Printable Receipt</div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h1>Create Service Receipt</h1>
+    <form id="soaForm">
+      <label for="serviceName">Service Name:</label>
+      <input type="text" id="serviceName" placeholder="e.g., Pet Grooming" required />
+
+      <label for="serviceProvider">Service Provider:</label>
+      <input type="text" id="serviceProvider" placeholder="e.g., Happy Paws" required />
+
+      <label for="serviceDate">Service Date:</label>
+      <input type="date" id="serviceDate" required />
+
+      <label for="amount">Amount ($):</label>
+      <input type="number" id="amount" placeholder="e.g., 50" min="0" step="0.01" required />
+
+      <label for="customerName">Customer Name:</label>
+      <input type="text" id="customerName" placeholder="e.g., Jane Doe" required />
+
+      <button type="button" onclick="generateReceipt()">Generate Receipt</button>
+    </form>
+  </div>
+
+  <div id="receipt">
+    <div class="receipt-card" id="receiptContent">
+      <h2>WonderPets Service Receipt</h2>
+      <div class="receipt-details">
+        <p><strong>Customer Name:</strong> <span id="rcptCustomerName"></span></p>
+        <p><strong>Service Name:</strong> <span id="rcptServiceName"></span></p>
+        <p><strong>Service Provider:</strong> <span id="rcptServiceProvider"></span></p>
+        <p><strong>Service Date:</strong> <span id="rcptServiceDate"></span></p>
+        <p><strong>Amount:</strong> $<span id="rcptAmount"></span></p>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <button id="printBtn" onclick="printReceipt()">Print Receipt</button>
+        <button id="historyBtn" onclick="showClientHistory()">Client History</button>
+        <button id="registerBtn" onclick="registerClient()">Register This Client</button>
+        <button id="anotherBtn" onclick="generateAnother()">Generate Another SOA</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clientHistory">
+    <h3>Client History</h3>
+    <div style="margin-bottom:10px;">
+      <button onclick="showClientTransactions()">View Client Transactions</button>
+    </div>
+    <ul id="clientList"></ul>
+  </div>
+
+</div>
+
+<script>
+  let clients = [];
+  let transactions = {}; // Store transactions per client
+
+  // Load clients and transactions from localStorage on page load
+  window.onload = () => {
+    const storedClients = localStorage.getItem('clients');
+    if (storedClients) {
+      clients = JSON.parse(storedClients);
+    }
+    const storedTransactions = localStorage.getItem('transactions');
+    if (storedTransactions) {
+      transactions = JSON.parse(storedTransactions);
+    }
+  };
+
+  function saveClients() {
+    localStorage.setItem('clients', JSON.stringify(clients));
+  }
+
+  function saveTransactions() {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+  }
+
+  function generateReceipt() {
+    const serviceName = document.getElementById('serviceName').value;
+    const serviceProvider = document.getElementById('serviceProvider').value;
+    const serviceDate = document.getElementById('serviceDate').value;
+    const amount = document.getElementById('amount').value;
+    const customerName = document.getElementById('customerName').value;
+
+    if (!serviceName || !serviceProvider || !serviceDate || !amount || !customerName) {
+      alert('Please fill all fields.');
+      return;
+    }
+
+    if (!clients.includes(customerName)) {
+      clients.push(customerName);
+      saveClients();
+    }
+
+    // Save transaction for the client
+    const transaction = {
+      serviceName,
+      serviceProvider,
+      serviceDate,
+      amount: parseFloat(amount).toFixed(2)
+    };
+    if (!transactions[customerName]) {
+      transactions[customerName] = [];
+    }
+    transactions[customerName].push(transaction);
+    saveTransactions();
+
+    // Show receipt
+    document.getElementById('rcptCustomerName').textContent = customerName;
+    document.getElementById('rcptServiceName').textContent = serviceName;
+    document.getElementById('rcptServiceProvider').textContent = serviceProvider;
+    document.getElementById('rcptServiceDate').textContent = serviceDate;
+    document.getElementById('rcptAmount').textContent = parseFloat(amount).toFixed(2);
+
+    document.getElementById('receipt').style.display = 'block';
+    document.querySelector('.card').style.display = 'none';
+    document.getElementById('clientHistory').style.display = 'none';
+  }
+
+  function printReceipt() {
+    const receiptElement = document.getElementById('receiptContent');
+    const printWin = window.open('', '', 'width=800,height=600');
+
+    printWin.document.write('<html><head><title>Print Receipt</title>');
+    printWin.document.write('<style>');
+    printWin.document.write(`
+      body { font-family: 'Roboto', sans-serif; margin: 20px; background: #fff; }
+      h2 { text-align: center; margin-bottom: 20px; color: #2E7D32; font-size: 2em; }
+      .receipt-details { font-size: 1.2em; line-height: 1.6; }
+      .receipt-details p { margin: 12px 0; }
+    `);
+    printWin.document.write('</style></head><body>');
+    printWin.document.write(receiptElement.innerHTML);
+    printWin.document.write('</body></html>');
+    printWin.document.close();
+    printWin.print();
+  }
+
+  function showClientHistory() {
+    const list = document.getElementById('clientList');
+    list.innerHTML = '';
+
+    if (clients.length === 0) {
+      list.innerHTML = '<li>No clients yet.</li>';
+    } else {
+      clients.forEach(client => {
+        const li = document.createElement('li');
+        // Custom structure with client name and info button
+        li.innerHTML = `
+          <div class="client-entry">
+            <span>${client}</span>
+            <button class="infoBtn" onclick="showClientTransactions('${client}')">Info</button>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+    document.getElementById('clientHistory').style.display = 'block';
+  }
+
+  function showClientTransactions(clientName) {
+    // If called with a client name, show their transactions directly
+    // If called without argument, show all clients with info buttons
+    // But here, we implement the button callback to show specific client transactions
+    if (!clientName) {
+      alert('Please select a client to view transactions.');
+      return;
+    }
+
+    const clientTransactions = transactions[clientName] || [];
+    if (clientTransactions.length === 0) {
+      alert(`No transactions found for ${clientName}.`);
+      return;
+    }
+
+    // Create a string with transaction details
+    let message = `Transactions for ${clientName}:\n\n`;
+    clientTransactions.forEach((tx, index) => {
+      message += `${index + 1}. Service: ${tx.serviceName}, Provider: ${tx.serviceProvider}, Date: ${tx.serviceDate}, Amount: $${tx.amount}\n`;
+    });
+    alert(message);
+  }
+
+  function registerClient() {
+    const customerName = document.getElementById('rcptCustomerName').textContent;
+    if (!customerName) {
+      alert('No client data to register. Please generate a receipt first.');
+      return;
+    }
+    if (!clients.includes(customerName)) {
+      clients.push(customerName);
+      saveClients();
+      alert('Client registered successfully.');
+    } else {
+      alert('Client is already registered.');
+    }
+  }
+
+  function generateAnother() {
+    document.getElementById('soaForm').reset();
+    document.getElementById('receipt').style.display = 'none';
+    document.querySelector('.card').style.display = 'block';
+    document.getElementById('clientHistory').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
